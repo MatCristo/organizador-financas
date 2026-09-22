@@ -37,7 +37,7 @@ class Conta(models.Model):
 
 
 
-class Lnacamento(models.Model):
+class Lancamento(models.Model):
     conta = models.ForeignKey(Conta, on_delete=models.CASCADE)
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE)
     descricao = models.CharField(max_length=255)
