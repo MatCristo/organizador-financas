@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { apiPost, apiPut, apiDelete } from '../api'
 
 function Categorias({ categorias, setCategorias, lancamentos, setLancamentos }) {
   const [nome, setNome] = useState('')
@@ -11,12 +12,7 @@ function Categorias({ categorias, setCategorias, lancamentos, setLancamentos }) 
   function handleSubmit(event) {
     event.preventDefault()
 
-    fetch('http://127.0.0.1:8000/api/categorias/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nome: nome, tipo: tipo })
-    })
-      .then(response => response.json())
+    apiPost('/categorias/', { nome: nome, tipo: tipo })
       .then(novaCategoria => {
         setCategorias([...categorias, novaCategoria])
         setNome('')
@@ -24,9 +20,7 @@ function Categorias({ categorias, setCategorias, lancamentos, setLancamentos }) 
   }
 
   function handleDelete(id) {
-    fetch(`http://127.0.0.1:8000/api/categorias/${id}/`, {
-      method: 'DELETE'
-    })
+    apiDelete(`/categorias/${id}/`)
       .then(() => {
         setCategorias(categorias.filter(categoria => categoria.id !== id))
         setLancamentos(lancamentos.filter(lancamento => lancamento.categoria !== id))
@@ -44,12 +38,7 @@ function Categorias({ categorias, setCategorias, lancamentos, setLancamentos }) 
   }
 
   function salvarEdicao(id) {
-    fetch(`http://127.0.0.1:8000/api/categorias/${id}/`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nome: nomeEdicao, tipo: tipoEdicao })
-    })
-      .then(response => response.json())
+    apiPut(`/categorias/${id}/`, { nome: nomeEdicao, tipo: tipoEdicao })
       .then(categoriaAtualizada => {
         setCategorias(categorias.map(categoria =>
           categoria.id === id ? categoriaAtualizada : categoria

@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { apiPost, apiPut, apiDelete } from '../api'
 
 function Contas({ contas, setContas, lancamentos, setLancamentos }) {
   const [nome, setNome] = useState('')
@@ -17,12 +18,7 @@ function Contas({ contas, setContas, lancamentos, setLancamentos }) {
   function handleSubmit(event) {
     event.preventDefault()
 
-    fetch('http://127.0.0.1:8000/api/contas/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nome: nome, saldo_inicial: Number(saldoInicial) })
-    })
-      .then(response => response.json())
+    apiPost('/contas/', { nome: nome, saldo_inicial: Number(saldoInicial) })
       .then(novaConta => {
         setContas([...contas, novaConta])
         setNome('')
@@ -31,9 +27,7 @@ function Contas({ contas, setContas, lancamentos, setLancamentos }) {
   }
 
   function handleDelete(id) {
-    fetch(`http://127.0.0.1:8000/api/contas/${id}/`, {
-      method: 'DELETE'
-    })
+    apiDelete(`/contas/${id}/`)
       .then(() => {
         setContas(contas.filter(conta => conta.id !== id))
         setLancamentos(lancamentos.filter(lancamento => lancamento.conta !== id))
@@ -51,12 +45,7 @@ function Contas({ contas, setContas, lancamentos, setLancamentos }) {
   }
 
   function salvarEdicao(id) {
-    fetch(`http://127.0.0.1:8000/api/contas/${id}/`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nome: nomeEdicao, saldo_inicial: Number(saldoEdicao) })
-    })
-      .then(response => response.json())
+    apiPut(`/contas/${id}/`, { nome: nomeEdicao, saldo_inicial: Number(saldoEdicao) })
       .then(contaAtualizada => {
         setContas(contas.map(conta =>
           conta.id === id ? contaAtualizada : conta

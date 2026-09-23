@@ -1,32 +1,51 @@
 import { useState, useEffect } from 'react'
+import Login from './components/Login'
 import Categorias from './components/Categorias'
 import Contas from './components/Contas'
 import Lancamentos from './components/Lancamentos'
+import { apiGet } from './api'
 
 function App() {
+  const [autenticado, setAutenticado] = useState(!!localStorage.getItem('accessToken'))
+
   const [contas, setContas] = useState([])
   const [categorias, setCategorias] = useState([])
   const [lancamentos, setLancamentos] = useState([])
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/api/contas/')
-      .then(response => response.json())
-      .then(data => setContas(data))
+    if (!autenticado) return
 
-    fetch('http://127.0.0.1:8000/api/categorias/')
-      .then(response => response.json())
-      .then(data => setCategorias(data))
+    apiGet('/contas/').then(data => setContas(data))
+    apiGet('/categorias/').then(data => setCategorias(data))
+    apiGet('/lancamentos/').then(data => setLancamentos(data))
+  }, [autenticado])
 
-    fetch('http://127.0.0.1:8000/api/lancamentos/')
-      .then(response => response.json())
-      .then(data => setLancamentos(data))
-  }, [])
+  function handleLogout() {
+    localStorage.removeItem('accessToken')
+    localStorage.removeItem('refreshToken')
+    setAutenticado(false)
+  }
+
+  if (!autenticado) {
+    return <Login onLogin={() => setAutenticado(true)} />
+  }
 
   return (
     <div>
       <h1>Organizador de Finanças</h1>
-      <Categorias categorias={categorias} setCategorias={setCategorias} lancamentos={lancamentos} setLancamentos={setLancamentos} />
-      <Contas contas={contas} setContas={setContas} lancamentos={lancamentos} setLancamentos={setLancamentos} />
+      <button onClick={handleLogout}>Sair</button>
+      <Categorias
+        categorias={categorias}
+        setCategorias={setCategorias}
+        lancamentos={lancamentos}
+        setLancamentos={setLancamentos}
+      />
+      <Contas
+        contas={contas}
+        setContas={setContas}
+        lancamentos={lancamentos}
+        setLancamentos={setLancamentos}
+      />
       <Lancamentos
         contas={contas}
         categorias={categorias}
@@ -38,4 +57,3 @@ function App() {
 }
 
 export default App
-

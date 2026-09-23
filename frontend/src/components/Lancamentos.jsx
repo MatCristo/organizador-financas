@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { apiPost, apiPut, apiDelete } from '../api'
 
 function Lancamentos({ contas, categorias, lancamentos, setLancamentos }) {
   const [descricao, setDescricao] = useState('')
@@ -22,18 +23,13 @@ function Lancamentos({ contas, categorias, lancamentos, setLancamentos }) {
       ? -Math.abs(Number(valor))
       : Math.abs(Number(valor))
 
-    fetch('http://127.0.0.1:8000/api/lancamentos/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        descricao: descricao,
-        valor: valorComSinal,
-        data: data,
-        conta: Number(contaId),
-        categoria: Number(categoriaId)
-      })
+    apiPost('/lancamentos/', {
+      descricao: descricao,
+      valor: valorComSinal,
+      data: data,
+      conta: Number(contaId),
+      categoria: Number(categoriaId)
     })
-      .then(response => response.json())
       .then(novoLancamento => {
         setLancamentos([...lancamentos, novoLancamento])
         setDescricao('')
@@ -43,9 +39,7 @@ function Lancamentos({ contas, categorias, lancamentos, setLancamentos }) {
   }
 
   function handleDelete(id) {
-    fetch(`http://127.0.0.1:8000/api/lancamentos/${id}/`, {
-      method: 'DELETE'
-    })
+    apiDelete(`/lancamentos/${id}/`)
       .then(() => {
         setLancamentos(lancamentos.filter(lancamento => lancamento.id !== id))
       })
@@ -70,18 +64,13 @@ function Lancamentos({ contas, categorias, lancamentos, setLancamentos }) {
       ? -Math.abs(Number(valorEdicao))
       : Math.abs(Number(valorEdicao))
 
-    fetch(`http://127.0.0.1:8000/api/lancamentos/${id}/`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        descricao: descricaoEdicao,
-        valor: valorComSinal,
-        data: dataEdicao,
-        conta: Number(contaIdEdicao),
-        categoria: Number(categoriaIdEdicao)
-      })
+    apiPut(`/lancamentos/${id}/`, {
+      descricao: descricaoEdicao,
+      valor: valorComSinal,
+      data: dataEdicao,
+      conta: Number(contaIdEdicao),
+      categoria: Number(categoriaIdEdicao)
     })
-      .then(response => response.json())
       .then(lancamentoAtualizado => {
         setLancamentos(lancamentos.map(lancamento =>
           lancamento.id === id ? lancamentoAtualizado : lancamento
