@@ -4,6 +4,10 @@ function Contas({ contas, setContas, lancamentos, setLancamentos }) {
   const [nome, setNome] = useState('')
   const [saldoInicial, setSaldoInicial] = useState('')
 
+  const [editandoId, setEditandoId] = useState(null)
+  const [nomeEdicao, setNomeEdicao] = useState('')
+  const [saldoEdicao, setSaldoEdicao] = useState('')
+
   function calcularSaldoAtual(conta) {
     const lancamentosDaConta = lancamentos.filter(l => l.conta === conta.id)
     const totalLancamentos = lancamentosDaConta.reduce((soma, l) => soma + Number(l.valor), 0)
@@ -32,7 +36,32 @@ function Contas({ contas, setContas, lancamentos, setLancamentos }) {
     })
       .then(() => {
         setContas(contas.filter(conta => conta.id !== id))
-        setLancamentos(lancamentos.filter(lancamento => lancamento.conta !==id))
+        setLancamentos(lancamentos.filter(lancamento => lancamento.conta !== id))
+      })
+  }
+
+  function iniciarEdicao(conta) {
+    setEditandoId(conta.id)
+    setNomeEdicao(conta.nome)
+    setSaldoEdicao(conta.saldo_inicial)
+  }
+
+  function cancelarEdicao() {
+    setEditandoId(null)
+  }
+
+  function salvarEdicao(id) {
+    fetch(`http://127.0.0.1:8000/api/contas/${id}/`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nome: nomeEdicao, saldo_inicial: Number(saldoEdicao) })
+    })
+      .then(response => response.json())
+      .then(contaAtualizada => {
+        setContas(contas.map(conta =>
+          conta.id === id ? contaAtualizada : conta
+        ))
+        setEditandoId(null)
       })
   }
 
@@ -42,8 +71,29 @@ function Contas({ contas, setContas, lancamentos, setLancamentos }) {
       <ul>
         {contas.map(conta => (
           <li key={conta.id}>
-            {conta.nome} — Saldo atual: R$ {calcularSaldoAtual(conta).toFixed(2)}
-            <button onClick={() => handleDelete(conta.id)}>Apagar</button>
+            {editandoId === conta.id ? (
+              <>
+                <input
+                  type="text"
+                  value={nomeEdicao}
+                  onChange={(e) => setNomeEdicao(e.target.value)}
+                />
+                <input
+                  type="number"
+                  step="0.01"
+                  value={saldoEdicao}
+                  onChange={(e) => setSaldoEdicao(e.target.value)}
+                />
+                <button onClick={() => salvarEdicao(conta.id)}>Salvar</button>
+                <button onClick={cancelarEdicao}>Cancelar</button>
+              </>
+            ) : (
+              <>
+                {conta.nome} — Saldo atual: R$ {calcularSaldoAtual(conta).toFixed(2)}
+                <button onClick={() => iniciarEdicao(conta)}>Editar</button>
+                <button onClick={() => handleDelete(conta.id)}>Apagar</button>
+              </>
+            )}
           </li>
         ))}
       </ul>
