@@ -1,7 +1,6 @@
-import { useState, useEffect} from 'react'
+import { useState } from 'react'
 
-
-function Categorias({ categorias, setCategorias }) {
+function Categorias({ categorias, setCategorias, lancamentos, setLancamentos }) {
   const [nome, setNome] = useState('')
   const [tipo, setTipo] = useState('despesa')
 
@@ -20,6 +19,16 @@ function Categorias({ categorias, setCategorias }) {
       })
   }
 
+  function handleDelete(id) {
+    fetch(`http://127.0.0.1:8000/api/categorias/${id}/`, {
+      method: 'DELETE'
+    })
+      .then(() => {
+        setCategorias(categorias.filter(categoria => categoria.id !== id))
+        setLancamentos(lancamentos.filter(lancamento => lancamento.categoria !== id))
+      })
+  }
+
   return (
     <div>
       <h2>Categorias</h2>
@@ -27,6 +36,7 @@ function Categorias({ categorias, setCategorias }) {
         {categorias.map(categoria => (
           <li key={categoria.id}>
             {categoria.nome} ({categoria.tipo})
+            <button onClick={() => handleDelete(categoria.id)}>Apagar</button>
           </li>
         ))}
       </ul>

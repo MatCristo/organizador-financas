@@ -25,8 +25,8 @@ function App() {
   return (
     <div>
       <h1>Organizador de Finanças</h1>
-      <Categorias categorias={categorias} setCategorias={setCategorias} />
-      <Contas contas={contas} setContas={setContas} lancamentos={lancamentos} />
+      <Categorias categorias={categorias} setCategorias={setCategorias} lancamentos={lancamentos} setLancamentos={setLancamentos} />
+      <Contas contas={contas} setContas={setContas} lancamentos={lancamentos} setLancamentos={setLancamentos} />
       <Lancamentos
         contas={contas}
         categorias={categorias}
@@ -38,3 +38,4 @@ function App() {
 }
 
 export default App
+

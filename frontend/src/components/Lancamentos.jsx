@@ -35,6 +35,15 @@ function Lancamentos({ contas, categorias, lancamentos, setLancamentos }) {
       })
   }
 
+  function handleDelete(id) {
+    fetch(`http://127.0.0.1:8000/api/lancamentos/${id}/`, {
+      method: 'DELETE'
+    })
+      .then(() => {
+        setLancamentos(lancamentos.filter(lancamento => lancamento.id !== id))
+      })
+  }
+
   return (
     <div>
       <h2>Lançamentos</h2>
@@ -43,6 +52,7 @@ function Lancamentos({ contas, categorias, lancamentos, setLancamentos }) {
           <li key={lancamento.id}>
             {lancamento.data} - {lancamento.descricao} - R$ {lancamento.valor}
             ({lancamento.categoria_nome} / {lancamento.conta_nome})
+            <button onClick={() => handleDelete(lancamento.id)}>Apagar</button>
           </li>
         ))}
       </ul>

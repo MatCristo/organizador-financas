@@ -1,6 +1,6 @@
 import { useState } from "react"
 
-function Contas({ contas, setContas, lancamentos }) {
+function Contas({ contas, setContas, lancamentos, setLancamentos }) {
   const [nome, setNome] = useState('')
   const [saldoInicial, setSaldoInicial] = useState('')
 
@@ -26,6 +26,16 @@ function Contas({ contas, setContas, lancamentos }) {
       })
   }
 
+  function handleDelete(id) {
+    fetch(`http://127.0.0.1:8000/api/contas/${id}/`, {
+      method: 'DELETE'
+    })
+      .then(() => {
+        setContas(contas.filter(conta => conta.id !== id))
+        setLancamentos(lancamentos.filter(lancamento => lancamento.conta !==id))
+      })
+  }
+
   return (
     <div>
       <h2>Contas</h2>
@@ -33,6 +43,7 @@ function Contas({ contas, setContas, lancamentos }) {
         {contas.map(conta => (
           <li key={conta.id}>
             {conta.nome} — Saldo atual: R$ {calcularSaldoAtual(conta).toFixed(2)}
+            <button onClick={() => handleDelete(conta.id)}>Apagar</button>
           </li>
         ))}
       </ul>
